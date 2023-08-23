@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kisito
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mohamine
+  namespace: kisito   # Specify the namespace for the ServiceAccount
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nebstephy-service
+  namespace: kisito
+spec:
+  selector:
+    app: nebstephy
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nebstephy-app-deployment
+  namespace: kisito
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: nebstephy
+  template:
+    metadata:
+      labels:
+        app: nebstephy
+      # Associate the ServiceAccount with the pod
+      serviceAccountName: mohamine
+    spec:
+      containers:
+        - name: nebstephy-app-container
+          image: devopseasylearning2021/s5fritz:latest
+          ports:
+            - containerPort: 80
+
